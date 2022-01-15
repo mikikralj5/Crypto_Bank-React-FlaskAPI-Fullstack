@@ -9,7 +9,7 @@ import UserCryptoList from "./UserCryptoList";
 import TransactionList from "./TransactionList";
 import TransactionRequestLits from "./TransactionRequestLits";
 
-const MainPage = ({ turnOnModal }) => {
+const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   const navigate = useNavigate();
   const [toShow, setToShow] = useState("all");
   const [currencySymbols, setCurrencySymbols] = useState([]);
@@ -35,6 +35,10 @@ const MainPage = ({ turnOnModal }) => {
     navigate("/");
   };
 
+  const updateTransactions = (newTransaction) => {
+    setUserTransactions([...userTransactions, newTransaction]);
+  };
+
   useEffect(() => {
     const getUserMoney = async () => {
       const resp = await httpClient("http://127.0.0.1:5000/getMoney");
@@ -43,7 +47,7 @@ const MainPage = ({ turnOnModal }) => {
     };
 
     getUserMoney();
-  }, [userMoney]);
+  }, [userMoney, amountToBuy]);
 
   useEffect(() => {
     const getUserCrypto = async () => {
@@ -125,6 +129,15 @@ const MainPage = ({ turnOnModal }) => {
     setToShow("requests");
   };
 
+  const onRequestResolve = (clickedReq) => {
+    console.log(clickedReq);
+    const newReq = userTransactionReqeusts.filter((req) => {
+      return req.hashID !== clickedReq.hashID;
+    });
+
+    setuserTransactionReqeusts(newReq);
+  };
+
   return (
     <main className="app">
       <div className="balance">
@@ -155,25 +168,27 @@ const MainPage = ({ turnOnModal }) => {
             turnOnModal={turnOnModal}
           />
         ) : null}
-        {toShow == "requests" ? (
+        {toShow === "requests" ? (
           <TransactionRequestLits
             userTransactionReqeusts={userTransactionReqeusts}
             turnOnModal={turnOnModal}
+            onRequestResolve={onRequestResolve}
+            updateTransactions={updateTransactions}
           />
         ) : null}
       </div>
       <div className="summary">
         <button className="btn btn--show" onClick={showCurrencyAll}>
-          Show currency states
+          All currency
         </button>
         <button className="btn btn--show" onClick={showTransactions}>
-          Show transactions
+          My transactions
         </button>
         <button className="btn btn--show" onClick={showUserCrypto}>
-          Show crypto
+          My crypto
         </button>
         <button className="btn btn--show" onClick={showTransactionRequests}>
-          Show transaction requests
+          My transaction requests
         </button>
       </div>
 
@@ -181,12 +196,14 @@ const MainPage = ({ turnOnModal }) => {
         currencySymbols={currencySymbols}
         transferAmount={transferAmount}
         setTransferAmount={setTransferAmount}
+        turnOnErroModal={turnOnErroModal}
       />
       <BankImport userMoney={userMoney} setUserMoney={setUserMoney} />
       <CurrencyExchange
         currencySymbolsUsd={currencySymbolsUsd}
         amountToBuy={amountToBuy}
         setAmountToBuy={setAmountToBuy}
+        turnOnErroModal={turnOnErroModal}
       />
     </main>
   );

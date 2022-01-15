@@ -8,7 +8,10 @@ const Transaction = ({ transaction, userEmail, turnOnModal }) => {
   if (transaction.state === "REJECTED") {
     transactionColor = "withdrawal";
     transactionAmount = "REJECTED";
-  } else if (transaction.state === "IN_PROGRESS") {
+  } else if (
+    transaction.state === "IN_PROGRESS" ||
+    transaction.state === "WAITING_FOR_USER"
+  ) {
     transactionColor = "progress";
     if (userEmail === transaction.sender) {
       transactionAmount = "-" + transaction.amount;

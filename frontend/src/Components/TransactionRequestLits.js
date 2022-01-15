@@ -1,7 +1,12 @@
 import React from "react";
 import TransactionRequest from "./TransactionRequest";
 
-const TransactionRequestLits = ({ userTransactionReqeusts, turnOnModal }) => {
+const TransactionRequestLits = ({
+  userTransactionReqeusts,
+  turnOnModal,
+  onRequestResolve,
+  updateTransactions,
+}) => {
   return (
     <div>
       {userTransactionReqeusts.map((transactionRequest, index) => (
@@ -9,6 +14,8 @@ const TransactionRequestLits = ({ userTransactionReqeusts, turnOnModal }) => {
           transactionRequest={transactionRequest}
           key={index}
           turnOnModal={turnOnModal}
+          onRequestResolve={onRequestResolve}
+          updateTransactions={updateTransactions}
         />
       ))}
     </div>

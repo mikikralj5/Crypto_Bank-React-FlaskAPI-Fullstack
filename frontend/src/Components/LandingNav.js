@@ -10,19 +10,19 @@ const LandingNav = () => {
   const navigate = useNavigate();
 
   const logInUser = async () => {
-    try {
-      const resp = await httpClient.post("http://127.0.0.1:5000/login", {
-        email,
-        password,
-      });
+    const resp = await httpClient.post("http://127.0.0.1:5000/login", {
+      email,
+      password,
+    });
 
+    console.log(resp.data);
+    if (resp.data.error === "Unauthorized") {
+      setErr(true);
+    } else if (resp.data.error === "need verification") {
+      navigate("/verification");
+    } else {
       navigate("/mainPage");
-    } catch (error) {
-      if (error.response.status === 401) {
-        setErr(true);
-      }
     }
-
     setEmail("");
     setPassword("");
   };

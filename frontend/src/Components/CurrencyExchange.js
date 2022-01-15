@@ -5,6 +5,7 @@ const CurrencyExchange = ({
   currencySymbolsUsd,
   amountToBuy,
   setAmountToBuy,
+  turnOnErroModal,
 }) => {
   // const [amountToBuy, setAmountToBuy] = useState(0);
   const [currencyBuy, setCurrencyBuy] = useState("USD");
@@ -16,13 +17,14 @@ const CurrencyExchange = ({
       currencyBuy,
       amountToBuy,
     });
-    console.log(resp.status);
+
     setAmountToBuy(0);
     setCurrecySell("USD");
     setCurrencyBuy("USD");
-    // console.log(amountToBuy);
-    // console.log(currencyBuy);
-    // console.log(currencySell);
+
+    if (resp.data.error !== undefined) {
+      turnOnErroModal(resp.data.error);
+    }
   };
   return (
     <div>

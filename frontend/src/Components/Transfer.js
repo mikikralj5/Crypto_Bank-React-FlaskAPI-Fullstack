@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import httpClient from "../httpClient";
 
-const Transfer = ({ currencySymbols, transferAmount, setTransferAmount }) => {
+const Transfer = ({
+  currencySymbols,
+  transferAmount,
+  setTransferAmount,
+  turnOnErroModal,
+}) => {
   const [recepient, setRecepient] = useState("");
   const [currencyTransfer, setCurrencyTrasfer] = useState("BTC");
 
@@ -14,13 +19,15 @@ const Transfer = ({ currencySymbols, transferAmount, setTransferAmount }) => {
         currencyTransfer,
       }
     );
-    console.log(resp.status);
+
     setTransferAmount(0);
     setCurrencyTrasfer("BTC");
     setRecepient("");
-    console.log(recepient);
-    console.log(transferAmount);
-    console.log(currencyTransfer);
+
+    console.log(resp);
+    if (resp.data.error !== undefined) {
+      turnOnErroModal(resp.data.error);
+    }
   };
   return (
     <div>
