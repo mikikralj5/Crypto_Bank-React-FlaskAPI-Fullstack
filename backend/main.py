@@ -497,7 +497,7 @@ def login_user():
 
     session["user_id"] = user.id #on je pravio neki hex za id
 
-    if user.verified == "false":
+    if user.otp == "false":
         return jsonify({"error": "need verification"})
 
     return Response(status=200)
