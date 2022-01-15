@@ -16,13 +16,9 @@ const LandingNav = () => {
     });
 
     console.log(resp.data);
-    if (resp.data.error === "Unauthorized") {
-      setErr(true);
-    } else if (resp.data.error === "need verification") {
-      navigate("/verification");
-    } else {
-      navigate("/mainPage");
-    }
+    if (resp.data.error === "Unauthorized") setErr(true);
+    else navigate("/verification", { state: { email: email } });
+
     setEmail("");
     setPassword("");
   };

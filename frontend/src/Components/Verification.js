@@ -1,81 +1,44 @@
 import React, { useState } from "react";
 import httpClient from "../httpClient";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Verification = () => {
-  const [number, setNumber] = useState("");
-  const [name, setName] = useState("");
-  const [expDate, setExpDate] = useState("");
-  const [securityCode, setSecurityCode] = useState("");
+  const [otp, setOtp] = useState("");
+
   const [err, setErr] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
+  const email = location.state.email;
   const verifyUser = async () => {
-    const resp = await httpClient.patch("http://127.0.0.1:5000/verifyUser", {
-      number,
-      name,
-      expDate,
-      securityCode,
+    const resp = await httpClient.patch("http://127.0.0.1:5000/validateOTP", {
+      otp,
+      email,
     });
 
     if (resp.data.verified === "true") {
       navigate("/mainPage");
     } else {
       setErr(true);
-      setName("");
-      setExpDate("");
-      setNumber("");
-      setSecurityCode("");
+      setOtp("");
     }
   };
 
   return (
     <div className="container">
       <label style={{ fontSize: "large" }}>
-        Please eneter your information to verify the account
+        Please eneter your verification code from your email
       </label>
       <form className="add-form">
         <div className="form-control">
-          <label>Card number</label>
           <input
             type="text"
-            placeholder="Enter card number"
-            value={number}
+            placeholder="Enter code here"
+            value={otp}
             onChange={(e) => {
-              setNumber(e.target.value);
+              setOtp(e.target.value);
               setErr(false);
             }}
-            required
-          />
-        </div>
-        <div className="form-control">
-          <label>Name</label>
-          <input
-            type="text"
-            placeholder="Enter your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="form-control">
-          <label>Expiration date</label>
-          <input
-            type="text"
-            placeholder="Enter your email"
-            value={expDate}
-            onChange={(e) => setExpDate(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-control">
-          <label>CVV</label>
-          <input
-            type="text"
-            placeholder="Enter your number"
-            value={securityCode}
-            onChange={(e) => setSecurityCode(e.target.value)}
             required
           />
         </div>
