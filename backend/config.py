@@ -17,8 +17,8 @@ class ApplicationConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
-    basedir, "CryptoDB.db"
-)
+        basedir, "CryptoDB.db"
+    )
 
     SESSION_COOKIE_SECURE = True
     SESSION_TYPE = "redis"
