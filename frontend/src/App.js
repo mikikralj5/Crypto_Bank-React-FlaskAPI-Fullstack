@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ModalWindow from "./Components/ModalWindow";
 import ErrorModal from "./Components/ErrorModal";
 import Verification from "./Components/Verification";
+import TransferValidationModal from "./Components/TransferValidationModal";
 import { useState } from "react";
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
   const [showErrorModal, setErrorModal] = useState(false);
   const [errorModalData, setErrorModalData] = useState("");
   const [modalTransaction, setModalTransaction] = useState(null);
+
   const turnOff = () => {
     setShowModal(false);
   };
@@ -29,6 +31,7 @@ function App() {
     setErrorModal(true);
     setErrorModalData(data);
   };
+
   return (
     <Router>
       <div>
@@ -42,6 +45,7 @@ function App() {
             errorModalData={errorModalData}
           />
         ) : null}
+
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route
@@ -55,6 +59,12 @@ function App() {
           />
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/verification" element={<Verification />} />
+          <Route
+            path="/verificationTransaction"
+            element={
+              <TransferValidationModal turnOnErroModal={turnOnErroModal} />
+            }
+          />
         </Routes>
       </div>
     </Router>

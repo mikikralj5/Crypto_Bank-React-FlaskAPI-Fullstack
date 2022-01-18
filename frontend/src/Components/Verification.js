@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 const Verification = () => {
   const [otp, setOtp] = useState("");
-
   const [err, setErr] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();

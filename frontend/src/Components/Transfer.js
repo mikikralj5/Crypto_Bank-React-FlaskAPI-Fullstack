@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import httpClient from "../httpClient";
+import { useNavigate } from "react-router-dom";
 
 const Transfer = ({
   currencySymbols,
@@ -9,26 +10,39 @@ const Transfer = ({
 }) => {
   const [recepient, setRecepient] = useState("");
   const [currencyTransfer, setCurrencyTrasfer] = useState("BTC");
-
-  const transferCrypto = async () => {
-    const resp = await httpClient.post(
-      "http://127.0.0.1:5000/createTransaction",
-      {
-        recepient,
-        transferAmount,
-        currencyTransfer,
-      }
-    );
-
+  const navigate = useNavigate();
+  const validateTransfer = async () => {
+    await httpClient.get("http://127.0.0.1:5000/sendOtp");
+    navigate("/verificationTransaction", {
+      state: {
+        recepient: recepient,
+        transferAmount: transferAmount,
+        currencyTransfer: currencyTransfer,
+      },
+    });
     setTransferAmount(0);
     setCurrencyTrasfer("BTC");
     setRecepient("");
-
-    console.log(resp);
-    if (resp.data.error !== undefined) {
-      turnOnErroModal(resp.data.error);
-    }
   };
+  // const transferCrypto = async () => {
+  //   const resp = await httpClient.post(
+  //     "http://127.0.0.1:5000/createTransaction",
+  //     {
+  //       recepient,
+  //       transferAmount,
+  //       currencyTransfer,
+  //     }
+  //   );
+
+  //   setTransferAmount(0);
+  //   setCurrencyTrasfer("BTC");
+  //   setRecepient("");
+
+  //   console.log(resp);
+  //   if (resp.data.error !== undefined) {
+  //     turnOnErroModal(resp.data.error);
+  //   }
+  // };
   return (
     <div>
       <div className="operation operation--transfer">
@@ -65,7 +79,7 @@ const Transfer = ({
           <button
             type="button"
             className="form__btn form__btn--transfer"
-            onClick={transferCrypto}
+            onClick={validateTransfer}
           >
             &rarr;
           </button>

@@ -11,6 +11,7 @@ import TransactionRequestLits from "./TransactionRequestLits";
 
 const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   const navigate = useNavigate();
+
   const [toShow, setToShow] = useState("all");
   const [currencySymbols, setCurrencySymbols] = useState([]);
   const [currencySymbolsUsd, setCurrencySymbolsUsd] = useState([]);
@@ -31,7 +32,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
     today.getDate() + "/" + (today.getMonth() + 1) + "/" + today.getFullYear();
 
   const logOut = async () => {
-    const resp = await httpClient.post("http://127.0.0.1:5000/logout");
+    await httpClient.post("http://127.0.0.1:5000/logout");
     navigate("/");
   };
 
@@ -121,8 +122,10 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
     setToShow("all");
   };
 
-  const showTransactions = () => {
+  const showTransactions = async () => {
     setToShow("transactions");
+    const resp = await httpClient.get("http://127.0.0.1:5000/getTransactions");
+    setUserTransactions(resp.data);
   };
 
   const showTransactionRequests = () => {

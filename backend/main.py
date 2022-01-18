@@ -265,7 +265,7 @@ def exchange():
 
 
 def mining(user_id, transaction_id, crypto_name, amount):
-    sleep(5*6)
+    sleep(5*2)
     basedir = os.path.abspath(os.path.dirname(__file__))
     engine = sqlalchemy.create_engine("sqlite:///" + os.path.join(
         basedir, "CryptoDB.db"))
@@ -320,14 +320,48 @@ def update_transaction_state():
     return Response(status=200)
 
 
+@app.route("/validateTransaction", methods=["PATCH"])
+def validate_transaction():
+    user_otp = request.json["otp"]
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+
+    if user_otp == user.otp:
+        user.otp = "0"  # oznaka da je validiran
+        return {"verified": "true"}
+    else:
+        return {"verified": "false"}
+
+
+@app.route("/sendOtp")
+def send_otp_email():
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+    send_mail(user)
+
+    return Response(status=200)
+
+
 @app.route("/createTransaction", methods=["POST"])
 def create_transaction():
     recipient_email = request.json["recepient"]
     amount = int(request.json["transferAmount"])
     cryptocurrency = request.json["currencyTransfer"]
+    user_otp = request.json["otp"]
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
     if user_exists(recipient_email) is True:
-        user_id = session.get("user_id")
-        user = User.query.get(user_id)
+
+        if user_otp != user.otp:
+            return {"error": "Validation failed, please try again"}
+
+        user_crypto = user.crypto_account.crypto_currencies
+        temp = filter(lambda x: x.name ==
+                      cryptocurrency and x.amount > amount, user_crypto)
+        temp = list(temp)
+        if temp == []:
+            return {"error": "You don't have enough resources for this transfer"}
+
         keccak = keccak_256()
         generated_string = "" + user.email + recipient_email + \
             str(amount) + str(randint(0, 1000))
