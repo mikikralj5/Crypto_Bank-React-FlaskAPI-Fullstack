@@ -114,8 +114,10 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
     getCurrencyAll();
   }, []);
 
-  const showUserCrypto = () => {
+  const showUserCrypto = async () => {
     setToShow("userCrypto");
+    const resp = await httpClient.get("http://127.0.0.1:5000/getCrypto");
+    setUserCryptoList(resp.data);
   };
 
   const showCurrencyAll = () => {
@@ -177,6 +179,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
             turnOnModal={turnOnModal}
             onRequestResolve={onRequestResolve}
             updateTransactions={updateTransactions}
+            showTransactions={showTransactions}
           />
         ) : null}
       </div>

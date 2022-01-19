@@ -6,14 +6,17 @@ const TransactionRequest = ({
   turnOnModal,
   onRequestResolve,
   updateTransactions,
+  showTransactions,
 }) => {
   const resolveRequest = async (value) => {
+    onRequestResolve(transactionRequest);
+    updateTransactions(transactionRequest);
     await httpClient.patch("http://127.0.0.1:5000/updateTransactionState", {
       state: value,
       transaction_id: transactionRequest.hashID,
     });
-    onRequestResolve(transactionRequest);
-    updateTransactions(transactionRequest);
+
+    showTransactions();
   };
 
   return (

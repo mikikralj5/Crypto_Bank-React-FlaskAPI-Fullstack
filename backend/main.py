@@ -19,6 +19,7 @@ from model.transaction_state import TransactionState
 from sqlalchemy import engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
 from config import os
+from multiprocessing import Process, Queue
 
 from model.user import User, UserSchema
 from model.transaction import Transaction, TransactionSchema
@@ -239,6 +240,10 @@ def exchange():
         crypto_currencies = crypto_account.crypto_currencies
         crypto_currency = next(
             filter(lambda x: x.name == sell, crypto_currencies), None)
+
+        if crypto_currency == None:
+            return {"error": "You don't have this currency"}
+
         if sum_to_pay > crypto_currency.amount:
             return {"error": "You don't have enough crypto currency"}
         crypto_currency.amount -= sum_to_pay
@@ -249,6 +254,10 @@ def exchange():
         crypto_currencies = crypto_account.crypto_currencies
         crypto_currency = next(
             filter(lambda x: x.name == sell, crypto_currencies), None)
+
+        if crypto_currency == None:
+            return {"error": "You don't have this currency"}
+
         if sum_to_pay > crypto_currency.amount:
             return {"error": "you don't have enough crypto currency"}, 400
         crypto_currency.amount -= sum_to_pay
@@ -264,11 +273,17 @@ def exchange():
     return Response(status=200)
 
 
-def mining(user_id, transaction_id, crypto_name, amount):
-    sleep(5*2)
+def announce(q1, q2):
+    q1.get()
+    q2.put("done")
+
+
+def mining(user_id, transaction_id, crypto_name, amount, q1):
+    sleep(5 * 2)
     basedir = os.path.abspath(os.path.dirname(__file__))
-    engine = sqlalchemy.create_engine("sqlite:///" + os.path.join(
-        basedir, "CryptoDB.db"))
+    engine = sqlalchemy.create_engine("sqlite:///" +
+                                      os.path.join(basedir, "CryptoDB.db"))
+
     local_session = sqlalchemy.orm.Session(bind=engine)
 
     transaction = local_session.query(Transaction).get(transaction_id)
@@ -280,8 +295,9 @@ def mining(user_id, transaction_id, crypto_name, amount):
     # da bi vratio listu ovo ogre je iterator
     crypto_currencies = list(iterator)
     if crypto_currencies == []:
-        crypto_currency = CryptoCurrency(
-            amount=amount, name=crypto_name, account_id=crypto_account.id)
+        crypto_currency = CryptoCurrency(amount=amount,
+                                         name=crypto_name,
+                                         account_id=crypto_account.id)
         local_session.add(crypto_currency)
         local_session.commit()
     else:
@@ -294,11 +310,14 @@ def mining(user_id, transaction_id, crypto_name, amount):
 
     transaction.state = TransactionState.DONE.value
     local_session.commit()
-    return Response(status=200)
+    q1.put("done")
 
 
 @app.route("/updateTransactionState", methods=["PATCH"])
-def update_transaction_state():
+async def update_transaction_state():
+    q1 = Queue()
+    q2 = Queue()
+
     transaction_id = request.json["transaction_id"]
     state = request.json["state"]
     user_id = session.get("user_id")
@@ -309,10 +328,16 @@ def update_transaction_state():
     if TransactionState[state].value == "IN_PROGRESS":
         transaction.state = TransactionState.IN_PROGRESS.value
         db.session.commit()
-        update_crypto_currency(transaction.cryptocurrency, -
-                               transaction.amount, crypto_account.crypto_currencies)
-        _thread.start_new_thread(
-            mining, (user_id, transaction_id, transaction.cryptocurrency, transaction.amount))
+        update_crypto_currency(transaction.cryptocurrency, -transaction.amount,
+                               crypto_account.crypto_currencies)
+        # _thread.start_new_thread(
+        #   mining, (user_id, transaction_id, transaction.cryptocurrency, transaction.amount, q1))
+        _thread.start_new_thread(announce, (q1, q2))
+        p = Process(target=mining,
+                    args=(user_id, transaction_id, transaction.cryptocurrency,
+                          transaction.amount, q1))
+        p.start()
+        q2.get()
     else:
         transaction.state = TransactionState.REJECTED.value
         db.session.commit()
