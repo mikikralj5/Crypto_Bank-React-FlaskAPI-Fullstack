@@ -143,6 +143,11 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
     setuserTransactionReqeusts(newReq);
   };
 
+  const onAccept = async () => {
+    const resp = await httpClient.get("http://127.0.0.1:5000/getTransactions");
+    setUserTransactions(resp.data);
+  };
+
   return (
     <main className="app">
       <div className="balance">
@@ -179,7 +184,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
             turnOnModal={turnOnModal}
             onRequestResolve={onRequestResolve}
             updateTransactions={updateTransactions}
-            showTransactions={showTransactions}
+            showTransactions={onAccept}
           />
         ) : null}
       </div>

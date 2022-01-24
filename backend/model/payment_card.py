@@ -12,15 +12,6 @@ class PaymentCard(db.Model):
     money_amount = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
-    def __init__(
-        self, card_number, cvv, expiration_date, user_name, money_amount, user_id
-    ):
-        self.card_number = card_number
-        self.cvv = cvv
-        self.expiration_date = expiration_date
-        self.user_name = user_name
-        self.money_amount = money_amount
-
 
 class PaymentCardSchema(ma.Schema):
     id = fields.Number()

@@ -20,7 +20,7 @@ from sqlalchemy import engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
 from config import os
 from multiprocessing import Process, Queue
-
+from datetime import datetime, timedelta
 from model.user import User, UserSchema
 from model.transaction import Transaction, TransactionSchema
 from model.payment_card import PaymentCard, PaymentCardSchema
@@ -33,18 +33,6 @@ from config import db, ma, ApplicationConfig, SQLAlchemy
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
 CORS(app, supports_credentials=True)
-
-# basedir = os.path.abspath(os.path.dirname(__file__))
-# app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
-
-# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
-#     basedir, "CryptoDB.db"
-# )
-# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-# app.config["SESSION_TYPE"] = redis
-# app.config["SESSION_PERMANENT"] = False
-# app.config["SESSION_REDIS"] = redis.from_url("redis://127.0.0.1:6379")
 
 bcrypt = Bcrypt(app)
 mail = Mail(app)
@@ -67,31 +55,6 @@ def create():
     return "All tables created"
 
 
-@app.route("/createCrypto_Account", methods=["POST"])
-def create_crypto_account():
-    amount = request.json["amount"]
-    user_id = request.json["user_id"]
-    user = User.query.get(user_id)
-    crypto_account = CryptoAccount(
-        amount=amount, crypto_currencies=[], user_id=user_id, user=user)
-    db.session.add(crypto_account)
-    db.session.commit()
-    return "crypto_account created", 200
-
-
-# Da li ovo uopste treba???
-@app.route("/depositPayment_Card", methods=["PATCH"])
-def deposit_payment_card():
-    amount = request.json["amount"]
-    user_id = session.get("user_id")
-    user = User.query.get(user_id)
-    payment_card = user.payment_card
-    payment_card.amount += amount
-    db.session.commit()
-
-    return Response(status=200)
-
-
 @app.route("/depositCrypto_Account", methods=["PATCH"])
 def deposit():
     amount = request.json["amount"]
@@ -105,18 +68,6 @@ def deposit():
 
     return Response(status=200)
 
-#
-# @app.route("/createCrypto_Currency", methods=["POST"])
-# def create_crypto_currency():
-#     amount = request.json["amount"]
-#     name = request.json["name"]
-#     account_id = request.json["account_id"]
-#     crypto_account = CryptoAccount.query.get(account_id)
-#     crypto_currency = CryptoCurrency(amount=amount, name=name, account_id=account_id, account=crypto_account)
-#     db.session.add(crypto_currency)
-#     db.session.commit()
-#     return "crypto_currency created", 200
-
 
 def send_mail(user):
     letters = string.ascii_letters
@@ -126,6 +77,41 @@ def send_mail(user):
                   sender="mailzaaplikaciju21@gmail.com", recipients=[user.email])
     msg.body = "Email Verification code = " + user.otp
     mail.send(msg)
+
+
+def gen_datetime():
+    # generate a datetime in format yyyy-mm-dd hh:mm:ss.000000
+    min_year = 2023
+    max_year = 2026
+    start = datetime(min_year, 1, 1, 00, 00, 00)
+    years = max_year - min_year + 1
+    end = start + timedelta(days=365 * years)
+    return start + (end - start) * random.random()
+
+
+def create_payment_account(user):
+    card_number = str(random.randint(1000, 9999))
+    cvv = str(random.randint(100, 999))
+    expiration_date = gen_datetime()
+    money_amount = random.randint(3000, 5000)
+    payment_card = PaymentCard(card_number=card_number,
+                               cvv=cvv,
+                               expiration_date=expiration_date,
+                               user_name=user.first_name,
+                               money_amount=money_amount,
+                               user=user)
+    db.session.add(payment_card)
+    db.session.commit()
+
+
+def create_crypto_account(user):
+    crypto_account = CryptoAccount(amount=0,
+                                   crypto_currencies=[],
+                                   user_id=user.id,
+                                   user=user)
+    db.session.add(crypto_account)
+    db.session.commit()
+    return "crypto_account created", 200
 
 
 def user_exists(email):
@@ -153,6 +139,30 @@ def create_crypto_currency(name, amount, crypto_account):
     db.session.add(crypto_currency)
     db.session.commit()
     return
+
+
+def get_price(buy, sell):
+
+    if buy == "USD":
+        url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
+        parameters = {"symbol": sell, "convert": buy}
+        headers = {"Accepts": "application/json",
+                   "X-CMC_PRO_API_KEY": "4ceb685b-2766-45cc-8127-147c64386639"}
+        sess = requests.Session()
+        sess.headers.update(headers)
+        response = sess.get(url, params=parameters)
+        price = response.json()["data"][sell]["quote"][buy]["price"]
+    else:  # jer u symbol ne mogu staviti USD, ocekuje crypto
+        url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
+        parameters = {"symbol": buy, "convert": sell}
+        headers = {"Accepts": "application/json",
+                   "X-CMC_PRO_API_KEY": "4ceb685b-2766-45cc-8127-147c64386639"}
+        sess = requests.Session()
+        sess.headers.update(headers)
+        response = sess.get(url, params=parameters)
+        price = response.json()["data"][buy]["quote"][sell]["price"]
+
+    return price
 
 
 @app.route("/showCrypto_all")
@@ -200,24 +210,7 @@ def exchange():
     x = request.json["amountToBuy"]
     amount = int(x)
 
-    if buy == "USD":
-        url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
-        parameters = {"symbol": sell, "convert": buy}
-        headers = {"Accepts": "application/json",
-                   "X-CMC_PRO_API_KEY": "4ceb685b-2766-45cc-8127-147c64386639"}
-        sess = requests.Session()
-        sess.headers.update(headers)
-        response = sess.get(url, params=parameters)
-        price = response.json()["data"][sell]["quote"][buy]["price"]
-    else:
-        url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
-        parameters = {"symbol": buy, "convert": sell}
-        headers = {"Accepts": "application/json",
-                   "X-CMC_PRO_API_KEY": "4ceb685b-2766-45cc-8127-147c64386639"}
-        sess = requests.Session()
-        sess.headers.update(headers)
-        response = sess.get(url, params=parameters)
-        price = response.json()["data"][buy]["quote"][sell]["price"]
+    price = get_price(buy, sell)
 
     user_id = session.get("user_id")
     user = User.query.get(user_id)
@@ -246,8 +239,8 @@ def exchange():
 
         if sum_to_pay > crypto_currency.amount:
             return {"error": "You don't have enough crypto currency"}
-        crypto_currency.amount -= sum_to_pay
-        crypto_account.amount += amount
+        crypto_currency.amount -= amount
+        crypto_account.amount += sum_to_pay
         db.session.commit()
 
     else:
@@ -279,7 +272,7 @@ def announce(q1, q2):
 
 
 def mining(user_id, transaction_id, crypto_name, amount, q1):
-    sleep(5 * 2)
+    sleep(5 * 5)
     basedir = os.path.abspath(os.path.dirname(__file__))
     engine = sqlalchemy.create_engine("sqlite:///" +
                                       os.path.join(basedir, "CryptoDB.db"))
@@ -292,7 +285,6 @@ def mining(user_id, transaction_id, crypto_name, amount, q1):
     crypto_account = user.crypto_account
     crypto_currencies = crypto_account.crypto_currencies
     iterator = filter(lambda x: x.name == crypto_name, crypto_currencies)
-    # da bi vratio listu ovo ogre je iterator
     crypto_currencies = list(iterator)
     if crypto_currencies == []:
         crypto_currency = CryptoCurrency(amount=amount,
@@ -330,8 +322,7 @@ async def update_transaction_state():
         db.session.commit()
         update_crypto_currency(transaction.cryptocurrency, -transaction.amount,
                                crypto_account.crypto_currencies)
-        # _thread.start_new_thread(
-        #   mining, (user_id, transaction_id, transaction.cryptocurrency, transaction.amount, q1))
+
         _thread.start_new_thread(announce, (q1, q2))
         p = Process(target=mining,
                     args=(user_id, transaction_id, transaction.cryptocurrency,
@@ -417,24 +408,6 @@ def filter_transaction():
     return jsonify(results), 200
 
 
-@app.route("/sortTransactions")
-def sort_function():
-    sort_by = request.json["sort_by"]
-    sort_type = request.json["sort_type"]
-
-    user_id = session.get("user_id")
-    user = User.query.get(user_id)
-    all_transactions = user.transactions
-    if sort_type == "Asc":
-        all_transactions.sort(key=lambda x: getattr(x, sort_by))
-    else:
-        all_transactions.sort(key=lambda x: getattr(x, sort_by), reverse=True)
-
-    schema = TransactionSchema(many=True)  # ako vracam vise
-    results = schema.dump(all_transactions)
-    return jsonify(results), 200
-
-
 # primljene i poslate njegove nema waiting for user
 @app.route("/getTransactions")
 def get_transactions():
@@ -449,40 +422,6 @@ def get_transactions():
     schema = TransactionSchema(many=True)  # ako vracam vise
     results = schema.dump(all_transactions)
     return jsonify(results)
-
-
-@app.route("/sortCrypto")
-def sort_crypto():
-    sort_by = request.json["sort_by"]
-    sort_type = request.json["sort_type"]
-
-    user_id = session.get("user_id")
-    user = User.query.get(user_id)
-    all_transactions = user.transactions
-    if sort_type == "Asc":
-        all_transactions.sort(key=lambda x: getattr(x, sort_by))
-    else:
-        all_transactions.sort(key=lambda x: getattr(x, sort_by), reverse=True)
-
-    schema = TransactionSchema(many=True)  # ako vracam vise
-    results = schema.dump(all_transactions)
-    return jsonify(results), 200
-
-
-@app.route("/filterCrypto", methods=["POST"])
-def filter_crypto():
-    filter_by = request.json["filter_by"]
-    value = request.json["value"]
-    user_id = session.get("user_id")
-    user = User.query.get(user_id)
-    all_transactions = user.transactions
-
-    all_transactions = filter(lambda x: getattr(
-        x, filter_by) == value, all_transactions)
-
-    schema = TransactionSchema(many=True)  # ako vracam vise
-    results = schema.dump(all_transactions)
-    return jsonify(results), 200
 
 
 @app.route("/getTransactionRequests")  # saom primljene
@@ -543,7 +482,7 @@ def register_user():
     city = request.json["city"]
 
     user_exists = User.query.filter_by(
-        email=email).first() is not None  # true ako postoji taj User
+        email=email).first() is not None
     if user_exists == True:
         return jsonify({"error": "User with that email already exists"}), 409
 
@@ -551,10 +490,11 @@ def register_user():
     user = User(name, lname, address, hashed_password,
                 email, phone, country, city)
 
-    # send_mail(user) sbes
-
     db.session.add(user)
     db.session.commit()
+
+    create_payment_account(user)
+    create_crypto_account(user)
 
     return Response(status=200)
 
@@ -592,31 +532,6 @@ def get_current_user():
 
     user = User.query.filter_by(id=user_id).first()
     return jsonify({"email": user.email})
-
-
-@app.route("/updateUser", methods=["PUT"])  # put ili patch
-def update_user():
-    user_id = session.get("user_id")
-    user = User.query.get(user_id)
-
-    user.first_name = request.json["name"]
-    user.last_name = request.json["lname"]
-    user.address = request.json["address"]
-    user.password = request.json["password"]
-    user.email = request.json["email"]
-    user.phone = request.json["phoneNum"]
-    user.country = request.json["country"]
-    user.city = request.json["city"]
-
-    email_adress_exists = User.query.filter_by(
-        email=user.email).count()  # true ako postoji taj User
-    if email_adress_exists > 1:
-        return jsonify({"error": "User with that email already exists"}), 409
-
-    user.password = bcrypt.generate_password_hash(user.password)
-
-    db.session.commit()
-    return redirect("/@me")
 
 
 if __name__ == "__main__":
