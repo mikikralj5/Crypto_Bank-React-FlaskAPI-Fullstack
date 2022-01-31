@@ -29,7 +29,9 @@ class ApplicationConfig:
 
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465
-    MAIL_USERNAME = 'mailzaaplikaciju21@gmail.com'
-    MAIL_PASSWORD = 'mailzaaplikaciju21'
+    MAIL_USERNAME = 'sbesmail123@gmail.com'
+    #MAIL_USERNAME = 'mailzaaplikaciju21@gmail.com'
+    #MAIL_PASSWORD = 'mailzaaplikaciju21'
+    MAIL_PASSWORD = 'Sifra567!'
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
