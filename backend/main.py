@@ -5,7 +5,9 @@ from controllers.auth import auth
 from controllers.crypto import crypto
 from controllers.transaction import transaction
 from controllers.account import account
-
+from datetime import datetime, timedelta
+from flask import jsonify
+from flask_jwt_extended import JWTManager
 from config import db, ma, mail, bcrypt, ApplicationConfig
 
 app = Flask(__name__)
@@ -21,6 +23,7 @@ CORS(app, supports_credentials=True)
 #mail = Mail(app)#ovo obrisi u buduce
 # enabeld server side seesion sve je na serveru sem session id
 server_session = Session(app)
+jwt = JWTManager(app)
 db.init_app(app)
 ma.init_app(app)
 bcrypt.init_app(app)
@@ -31,6 +34,16 @@ def create():
     db.create_all()
     return "All tables created"
 
+# @app.route("/authh")
+# def authh():
+#     access_token = create_access_token(identity="aaaaaa", expires_delta=timedelta(minutes=10))
+#     return jsonify(access_token=access_token), 200
+
+# @app.route("/reqTest")
+# @jwt_required()
+# def reqTest():
+
+#     return "i need token bro"
 
 if __name__ == "__main__":
     app.run(debug=True)

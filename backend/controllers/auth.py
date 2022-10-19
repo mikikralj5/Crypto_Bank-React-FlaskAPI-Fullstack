@@ -7,6 +7,10 @@ from datetime import datetime, timedelta
 import random
 from config import db, bcrypt
 from modules.modules import send_mail
+from flask_jwt_extended import (
+     jwt_required, create_access_token,
+    get_jwt_identity
+)
 
 auth = Blueprint("auth", __name__)
 
@@ -19,8 +23,11 @@ def verification_with_otp():
     if user_otp == user.otp:
         user.otp = "0"  # oznaka da je validiran
         db.session.commit()
-        session["user_id"] = user.id
-        return {"verified": "true"}
+        #session["user_id"] = user.id
+        access_token = create_access_token(identity=user.id, expires_delta=timedelta(minutes=30))
+        #return jsonify(access_token=access_token), 200
+        return {"token" : access_token, "verified" : "true"}
+        #return {"verified": "true"}
     else:
         return {"verified": "false"}
 
@@ -66,10 +73,12 @@ def login_user():
     if not bcrypt.check_password_hash(user.password, password):
         return jsonify({"error": "Unauthorized"})
 
-    send_mail(user)
+    mail_status = send_mail(user)
 
-    return Response(status=200)
-
+    if mail_status:
+        return Response(status=200)
+    else:
+        return "failed to send mail"
 
 @auth.route("/logout", methods=["POST"])
 def logout_user():
@@ -79,8 +88,10 @@ def logout_user():
 
 
 @auth.route("/@me")
+@jwt_required()
 def get_current_user():
-    user_id = session.get("user_id")
+    #user_id = session.get("user_id")
+    user_id = get_jwt_identity()
 
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401

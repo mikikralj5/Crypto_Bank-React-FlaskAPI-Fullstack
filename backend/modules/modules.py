@@ -11,8 +11,10 @@ def send_mail(user):
     msg = Message(subject="Verification Code",
                   sender="mailzaaplikaciju21@gmail.com", recipients=[user.email])
     msg.body = "Email Verification code = " + user.otp
-    mail.send(msg)
-
+    try:
+        mail.send(msg)
+    except:
+        return False
 
 def update_crypto_currency(name, amount, crypto_currencies):
     crypto_currency = next(

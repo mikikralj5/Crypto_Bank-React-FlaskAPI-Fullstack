@@ -13,17 +13,23 @@ from time import sleep
 from config import os
 import sqlalchemy
 from model.crypto_currency import CryptoCurrency
+from flask_jwt_extended import (
+    jwt_required,
+    get_jwt_identity
+)
 
 transaction = Blueprint("transaction", __name__)
 
 @transaction.route("/updateTransactionState", methods=["PATCH"])
+@jwt_required()
 async def update_transaction_state():
     q1 = Queue()
     q2 = Queue()
 
     transaction_id = request.json["transaction_id"]
     state = request.json["state"]
-    user_id = session.get("user_id")
+    #user_id = session.get("user_id")
+    user_id = get_jwt_identity()
     transaction = Transaction.query.get(transaction_id)
     recipient = User.query.filter_by(email=transaction.sender).first()
     crypto_account = recipient.crypto_account
@@ -48,9 +54,11 @@ async def update_transaction_state():
 
 
 @transaction.route("/validateTransaction", methods=["PATCH"])
+@jwt_required()
 def validate_transaction():
     user_otp = request.json["otp"]
-    user_id = session.get("user_id")
+    user_id = get_jwt_identity()
+    #user_id = session.get("user_id")
     user = User.query.get(user_id)
 
     if user_otp == user.otp:
@@ -61,8 +69,10 @@ def validate_transaction():
 
 
 @transaction.route("/sendOtp")
+@jwt_required()
 def send_otp_email():
-    user_id = session.get("user_id")
+    #user_id = session.get("user_id")
+    user_id = get_jwt_identity()
     user = User.query.get(user_id)
     send_mail(user)
 
@@ -70,12 +80,14 @@ def send_otp_email():
 
 
 @transaction.route("/createTransaction", methods=["POST"])
+@jwt_required()
 def create_transaction():
     recipient_email = request.json["recepient"]
     amount = int(request.json["transferAmount"])
     cryptocurrency = request.json["currencyTransfer"]
     user_otp = request.json["otp"]
-    user_id = session.get("user_id")
+    #user_id = session.get("user_id")
+    user_id = get_jwt_identity()
     user = User.query.get(user_id)
     if user_exists(recipient_email) is True:
 
@@ -104,10 +116,12 @@ def create_transaction():
 
 
 @transaction.route("/filterTransaction", methods=["POST"])
+@jwt_required()
 def filter_transaction():
     filter_by = request.json["filter_by"]
     value = request.json["value"]
-    user_id = session.get("user_id")
+    #user_id = session.get("user_id")
+    user_id = get_jwt_identity()
     user = User.query.get(user_id)
     all_transactions = user.transactions
 
@@ -121,8 +135,10 @@ def filter_transaction():
 
 # primljene i poslate njegove nema waiting for user
 @transaction.route("/getTransactions")
+@jwt_required()
 def get_transactions():
-    user_id = session.get("user_id")
+    #user_id = session.get("user_id")
+    user_id = get_jwt_identity()
     user = User.query.get(user_id)
     #all_transactions = user.transactions
     all_transactions = Transaction.query.all()
@@ -136,8 +152,10 @@ def get_transactions():
 
 
 @transaction.route("/getTransactionRequests")  # saom primljene
+@jwt_required()
 def get_transaction_requests():
-    user_id = session.get("user_id")
+    #user_id = session.get("user_id")
+    user_id = get_jwt_identity()
     user = User.query.get(user_id)
     all_transactions = Transaction.query.all()
     iterator = filter(lambda x: x.state ==

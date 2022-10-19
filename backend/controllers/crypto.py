@@ -6,11 +6,16 @@ import json
 from config import db
 from model.crypto_currency import CryptoCurrency
 from modules.modules import update_crypto_currency
+from flask_jwt_extended import (
+    jwt_required,
+    get_jwt_identity
+)
 
 crypto = Blueprint("crypto", __name__)
 
 
 @crypto.route("/showCrypto_all")
+@jwt_required()
 def get_crypto_value():
     url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest"
     # parameters = {"start": 1, "limit": 5000}
@@ -32,6 +37,7 @@ def get_crypto_value():
 
 
 @crypto.route("/showCryptoSymbols")
+@jwt_required()
 def get_all_crypto_currencies():
     url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map"
     parameters = {"sort": "cmc_rank"}
@@ -49,6 +55,7 @@ def get_all_crypto_currencies():
 
 
 @crypto.route("/exchange", methods=["PATCH"])
+@jwt_required()
 def exchange():
     sell = request.json["currencySell"]
     buy = request.json["currencyBuy"]
@@ -56,8 +63,8 @@ def exchange():
     amount = int(x)
 
     price = get_price(buy, sell)
-
-    user_id = session.get("user_id")
+    user_id = get_jwt_identity()
+    #user_id = session.get("user_id")
     user = User.query.get(user_id)
     crypto_account = user.crypto_account
     sum_to_pay = price * amount
