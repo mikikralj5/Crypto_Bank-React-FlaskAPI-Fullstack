@@ -1,5 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_mail import Mail
+from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 import os
 import redis
@@ -8,6 +10,9 @@ import redis
 load_dotenv()
 db = SQLAlchemy()
 ma = Marshmallow()
+mail = Mail()
+bcrypt = Bcrypt()
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
