@@ -32,7 +32,8 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
     today.getDate() + "/" + (today.getMonth() + 1) + "/" + today.getFullYear();
 
   const logOut = async () => {
-    await httpClient.post("http://127.0.0.1:5000/logout");
+    //await httpClient.post("http://127.0.0.1:5000/logout");
+    localStorage.clear();
     navigate("/");
   };
 
@@ -42,7 +43,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
 
   useEffect(() => {
     const getUserMoney = async () => {
-      const resp = await httpClient("http://127.0.0.1:5000/getMoney");
+      const resp = await httpClient("http://127.0.0.1:5000/account/getMoney");
 
       setUserMoney(resp.data.value);
     };
@@ -52,7 +53,9 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
 
   useEffect(() => {
     const getUserCrypto = async () => {
-      const resp = await httpClient.get("http://127.0.0.1:5000/getCrypto");
+      const resp = await httpClient.get(
+        "http://127.0.0.1:5000/account/getCrypto"
+      );
       setUserCryptoList(resp.data);
     };
 
@@ -62,7 +65,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   useEffect(() => {
     const getUserTransactions = async () => {
       const resp = await httpClient.get(
-        "http://127.0.0.1:5000/getTransactions"
+        "http://127.0.0.1:5000/transaction/getTransactions"
       );
       setUserTransactions(resp.data);
     };
@@ -73,7 +76,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   useEffect(() => {
     const getTransactionRequests = async () => {
       const resp = await httpClient.get(
-        "http://127.0.0.1:5000/getTransactionRequests"
+        "http://127.0.0.1:5000/transaction/getTransactionRequests"
       );
 
       setuserTransactionReqeusts(resp.data);
@@ -84,7 +87,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
 
   useEffect(() => {
     const getUserEmail = async () => {
-      const resp = await httpClient.get("http://127.0.0.1:5000/@me");
+      const resp = await httpClient.get("http://127.0.0.1:5000/auth/@me");
       setUserEmail(resp.data.email);
     };
 
@@ -94,7 +97,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   useEffect(() => {
     const getSymbol = async () => {
       const resp = await httpClient.get(
-        "http://127.0.0.1:5000/showCryptoSymbols"
+        "http://127.0.0.1:5000/crypto/showCryptoSymbols"
       );
 
       const data = ["USD", ...resp.data];
@@ -107,7 +110,9 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
 
   useEffect(() => {
     const getCurrencyAll = async () => {
-      const resp = await httpClient.get("http://127.0.0.1:5000/showCrypto_all");
+      const resp = await httpClient.get(
+        "http://127.0.0.1:5000/crypto/showCrypto_all"
+      );
       setCurrencyAll(resp.data);
     };
 
@@ -116,7 +121,9 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
 
   const showUserCrypto = async () => {
     setToShow("userCrypto");
-    const resp = await httpClient.get("http://127.0.0.1:5000/getCrypto");
+    const resp = await httpClient.get(
+      "http://127.0.0.1:5000/account/getCrypto"
+    );
     setUserCryptoList(resp.data);
   };
 
@@ -126,7 +133,9 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
 
   const showTransactions = async () => {
     setToShow("transactions");
-    const resp = await httpClient.get("http://127.0.0.1:5000/getTransactions");
+    const resp = await httpClient.get(
+      "http://127.0.0.1:5000/transaction/getTransactions"
+    );
     setUserTransactions(resp.data);
   };
 
@@ -144,7 +153,9 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   };
 
   const onAccept = async () => {
-    const resp = await httpClient.get("http://127.0.0.1:5000/getTransactions");
+    const resp = await httpClient.get(
+      "http://127.0.0.1:5000/transaction/getTransactions"
+    );
     setUserTransactions(resp.data);
   };
 

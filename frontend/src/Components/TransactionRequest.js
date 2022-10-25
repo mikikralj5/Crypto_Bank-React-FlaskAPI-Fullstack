@@ -11,10 +11,13 @@ const TransactionRequest = ({
   const resolveRequest = async (value) => {
     onRequestResolve(transactionRequest);
     updateTransactions(transactionRequest);
-    await httpClient.patch("http://127.0.0.1:5000/updateTransactionState", {
-      state: value,
-      transaction_id: transactionRequest.hashID,
-    });
+    await httpClient.patch(
+      "http://127.0.0.1:5000/transaction/updateTransactionState",
+      {
+        state: value,
+        transaction_id: transactionRequest.hashID,
+      }
+    );
 
     showTransactions();
   };

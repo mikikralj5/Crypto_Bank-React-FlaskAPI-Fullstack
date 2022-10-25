@@ -12,7 +12,7 @@ const CurrencyExchange = ({
   const [currencySell, setCurrecySell] = useState("USD");
 
   const exchangeCurrency = async () => {
-    const resp = await httpClient.patch("http://127.0.0.1:5000/exchange", {
+    const resp = await httpClient.patch("http://127.0.0.1:5000/crypto/exchange", {
       currencySell,
       currencyBuy,
       amountToBuy,

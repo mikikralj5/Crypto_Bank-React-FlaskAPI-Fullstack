@@ -5,7 +5,7 @@ const BankImport = ({ userMoney, setUserMoney }) => {
   const [amount, setAmount] = useState(0);
   const transferMoney = async () => {
     const resp = await httpClient.patch(
-      "http://127.0.0.1:5000/depositCrypto_Account",
+      "http://127.0.0.1:5000/account/depositCrypto_Account",
       { amount }
     );
 

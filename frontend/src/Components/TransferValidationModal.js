@@ -13,7 +13,7 @@ const TransferValidationModal = ({ turnOnErroModal }) => {
 
   const makeTransaction = async () => {
     const resp = await httpClient.post(
-      "http://127.0.0.1:5000/createTransaction",
+      "http://127.0.0.1:5000/transaction/createTransaction",
       {
         recepient,
         transferAmount,

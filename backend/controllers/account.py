@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, Response
 from flask import request, session, jsonify
 from model.user import User
 from config import db
@@ -24,7 +24,7 @@ def deposit():
     payment_card.money_amount -= int(amount)
     crypto_account.amount += int(amount)
     db.session.commit()
-
+    return Response(status=200)
 
 @account.route("/getCrypto")  # pregled stanja
 @jwt_required()

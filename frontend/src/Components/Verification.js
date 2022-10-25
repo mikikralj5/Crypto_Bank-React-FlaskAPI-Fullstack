@@ -10,12 +10,17 @@ const Verification = () => {
 
   const email = location.state.email;
   const verifyUser = async () => {
-    const resp = await httpClient.patch("http://127.0.0.1:5000/validateOTP", {
-      otp,
-      email,
-    });
+    const resp = await httpClient.patch(
+      "http://127.0.0.1:5000/auth/validateOTP",
+      {
+        otp,
+        email,
+      }
+    );
 
     if (resp.data.verified === "true") {
+      console.log(resp.data.token);
+      localStorage.setItem("token", resp.data.token);
       navigate("/mainPage");
     } else {
       setErr(true);
