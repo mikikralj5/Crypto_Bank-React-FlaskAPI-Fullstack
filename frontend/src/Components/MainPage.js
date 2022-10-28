@@ -8,6 +8,7 @@ import Transfer from "./Transfer";
 import UserCryptoList from "./UserCryptoList";
 import TransactionList from "./TransactionList";
 import TransactionRequestLits from "./TransactionRequestLits";
+import CryptoGraphs from "./CryptoGraphs";
 
 const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   const navigate = useNavigate();
@@ -143,6 +144,10 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
     setToShow("requests");
   };
 
+  const showCryptoGraphs = () => {
+    setToShow("graphs");
+  };
+
   const onRequestResolve = (clickedReq) => {
     console.log(clickedReq);
     const newReq = userTransactionReqeusts.filter((req) => {
@@ -198,6 +203,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
             showTransactions={onAccept}
           />
         ) : null}
+        {toShow === "graphs" ? <CryptoGraphs /> : null}
       </div>
       <div className="summary">
         <button className="btn btn--show" onClick={showCurrencyAll}>
@@ -211,6 +217,9 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
         </button>
         <button className="btn btn--show" onClick={showTransactionRequests}>
           My transaction requests
+        </button>
+        <button className="btn btn--show" onClick={showCryptoGraphs}>
+          Crypto charts
         </button>
       </div>
 

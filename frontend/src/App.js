@@ -1,6 +1,7 @@
 import LandingPage from "./Components/LandingPage";
 import RegistrationForm from "./Components/RegistrationForm";
 import MainPage from "./Components/MainPage";
+import CryptoGraphs from "./Components/CryptoGraphs";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ModalWindow from "./Components/ModalWindow";
 import ErrorModal from "./Components/ErrorModal";
@@ -65,6 +66,7 @@ function App() {
               <TransferValidationModal turnOnErroModal={turnOnErroModal} />
             }
           />
+          <Route path="/graphs" element={<CryptoGraphs />} />
         </Routes>
       </div>
     </Router>
