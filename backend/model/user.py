@@ -37,7 +37,7 @@ class User(db.Model):
         self.phone = phone
         self.country = country
         self.city = city
-        self.role = role,
+        self.role = role
         self.is_blocked = is_blocked
 
 

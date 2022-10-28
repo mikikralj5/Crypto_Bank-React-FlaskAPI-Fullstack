@@ -53,7 +53,7 @@ def register_user():
 
     hashed_password = bcrypt.generate_password_hash(password)
     user = User(name, lname, address, hashed_password,
-                email, phone, country, city, role, 0)
+                email, phone, country, city, role, False)
 
     db.session.add(user)
     db.session.commit()
