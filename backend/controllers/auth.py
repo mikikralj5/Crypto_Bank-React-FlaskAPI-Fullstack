@@ -7,6 +7,7 @@ from model.crypto_account import CryptoAccount
 from datetime import datetime, timedelta
 import random
 from config import db, bcrypt
+from model.user import UserSchema
 from modules.modules import send_mail
 from flask_jwt_extended import (
      jwt_required, create_access_token,
@@ -69,7 +70,7 @@ def login_user():
     password = request.json["password"]
     email = request.json["email"]
 
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=email).filter_by(is_blocked = False).first()
     if user is None:
         return jsonify({"error": "Unauthorized"})
 
@@ -92,7 +93,7 @@ def logout_user():
 
 @auth.route("/@me")
 @jwt_required()
-@admin_required()
+#@admin_required()
 def get_current_user():
     #user_id = session.get("user_id")
     user_id = get_jwt_identity()["id"]
@@ -103,6 +104,29 @@ def get_current_user():
 
     user = User.query.filter_by(id=user_id).first()
     return jsonify({"email": user.email})
+
+@auth.route("/getAllUsers")
+@jwt_required()
+@admin_required()
+def get_all_users():
+   
+    all_users = User.query.filter_by(is_blocked = False)
+    schema = UserSchema(many=True)
+    res = schema.dump(all_users)
+    return jsonify(res)
+
+
+@auth.route("/blockUser", methods=["POST"])
+@jwt_required()
+@admin_required()
+def block_user():
+    user_id = request.json["userId"]
+    user = User.query.get(user_id)
+    user.is_blocked = True
+    db.session.commit()
+
+    return "User blocked", 200
+
 
 #region Functions
 def gen_datetime():
