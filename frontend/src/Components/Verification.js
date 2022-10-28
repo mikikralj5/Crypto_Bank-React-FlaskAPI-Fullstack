@@ -19,8 +19,9 @@ const Verification = () => {
     );
 
     if (resp.data.verified === "true") {
-      console.log(resp.data.token);
+      console.log(resp.data.role);
       localStorage.setItem("token", resp.data.token);
+      localStorage.setItem("role", resp.data.role);
       navigate("/mainPage");
     } else {
       setErr(true);

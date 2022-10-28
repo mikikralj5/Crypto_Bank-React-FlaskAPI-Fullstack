@@ -8,6 +8,8 @@ import ErrorModal from "./Components/ErrorModal";
 import Verification from "./Components/Verification";
 import TransferValidationModal from "./Components/TransferValidationModal";
 import { useState } from "react";
+import Unauthorized from "./Components/Unauthorized";
+import RequireAuth from "./RequireAuth";
 
 function App() {
   const [showModal, setShowModal] = useState(false);
@@ -48,7 +50,10 @@ function App() {
         ) : null}
 
         <Routes>
+          <Route path="/register" element={<RegistrationForm />} />
           <Route path="/" element={<LandingPage />} />
+
+          {/* <Route element={<RequireAuth />}> */}
           <Route
             path="/mainPage"
             element={
@@ -58,7 +63,6 @@ function App() {
               />
             }
           />
-          <Route path="/register" element={<RegistrationForm />} />
           <Route path="/verification" element={<Verification />} />
           <Route
             path="/verificationTransaction"
@@ -67,6 +71,8 @@ function App() {
             }
           />
           <Route path="/graphs" element={<CryptoGraphs />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          {/* </Route> */}
         </Routes>
       </div>
     </Router>

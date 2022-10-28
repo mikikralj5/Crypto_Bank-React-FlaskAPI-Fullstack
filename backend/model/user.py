@@ -1,3 +1,4 @@
+from email.policy import default
 from .crypto_account import CryptoAccountSchema
 from .payment_card import PaymentCardSchema
 from .transaction import TransactionSchema
@@ -17,7 +18,8 @@ class User(db.Model):
     country = db.Column(db.String(50))
     city = db.Column(db.String(50))
     role = db.Column(db.String(50))
-    otp = db.Column(db.String(7))
+    is_blocked = db.Column(db.Boolean())
+    otp = db.Column(db.String(7), default=" ")
     crypto_account = db.relationship(
         "CryptoAccount", backref="user", uselist=False
     )  # one to one
@@ -25,7 +27,7 @@ class User(db.Model):
     transactions = db.relationship("Transaction", backref="user")
 
     def __init__(
-        self, first_name, last_name, address, password, email, phone, country, city
+        self, first_name, last_name, address, password, email, phone, country, city, role, is_blocked
     ):
         self.first_name = first_name
         self.last_name = last_name
@@ -35,6 +37,8 @@ class User(db.Model):
         self.phone = phone
         self.country = country
         self.city = city
+        self.role = role,
+        self.is_blocked = is_blocked
 
 
 class UserSchema(ma.Schema):
@@ -48,6 +52,7 @@ class UserSchema(ma.Schema):
     country = fields.Str()
     city = fields.Str()
     role = fields.Str()
+    is_blocked = fields.Bool()
     otp = fields.Str()
     crypto_account = fields.Nested(CryptoAccountSchema)
     payment_card = fields.Nested(PaymentCardSchema)

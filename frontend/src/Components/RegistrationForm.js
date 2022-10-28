@@ -11,6 +11,7 @@ const RegistrationForm = () => {
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
+  const [role, setRole] = useState("");
 
   const navigate = useNavigate();
 
@@ -24,6 +25,7 @@ const RegistrationForm = () => {
       phoneNum,
       country,
       city,
+      role,
     });
 
     navigate("/");
@@ -103,6 +105,13 @@ const RegistrationForm = () => {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
+        </div>
+        <div className="form-control">
+          <label>Role</label>
+          <select id="usertype" onChange={(e) => setRole(e.target.value)}>
+            <option value="PUSER">Premium user</option>
+            <option value="RUSER">Regular user</option>
+          </select>
         </div>
 
         <input type="submit" value="Register" className="btn btn-block" />

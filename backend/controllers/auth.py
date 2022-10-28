@@ -1,4 +1,5 @@
 from flask import Blueprint
+from sqlalchemy import false
 from model.user import User
 from flask import jsonify, request, session, Response
 from model.payment_card import PaymentCard
@@ -43,6 +44,7 @@ def register_user():
     phone = request.json["phoneNum"]
     country = request.json["country"]
     city = request.json["city"]
+    role = request.json["role"]
 
     user_exists = User.query.filter_by(
         email=email).first() is not None
@@ -51,7 +53,7 @@ def register_user():
 
     hashed_password = bcrypt.generate_password_hash(password)
     user = User(name, lname, address, hashed_password,
-                email, phone, country, city)
+                email, phone, country, city, role, 0)
 
     db.session.add(user)
     db.session.commit()

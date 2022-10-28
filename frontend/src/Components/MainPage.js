@@ -174,7 +174,6 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
           </p>
         </div>
         <p className="balance__value">{Math.round(userMoney)}$</p>
-
         <button className="btn" onClick={logOut}>
           logout
         </button>
@@ -218,9 +217,11 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
         <button className="btn btn--show" onClick={showTransactionRequests}>
           My transaction requests
         </button>
-        <button className="btn btn--show" onClick={showCryptoGraphs}>
-          Crypto charts
-        </button>
+        {localStorage.getItem("role") === "PUSER" ? (
+          <button className="btn btn--show" onClick={showCryptoGraphs}>
+            Crypto charts
+          </button>
+        ) : null}
       </div>
 
       <Transfer
