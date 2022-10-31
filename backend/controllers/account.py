@@ -17,7 +17,7 @@ account = Blueprint("account", __name__)
 def deposit():
     amount = request.json["amount"]
     #user_id = session.get("user_id")
-    user_id = get_jwt_identity()
+    user_id = get_jwt_identity()["id"]
     user = User.query.get(user_id)
     payment_card = user.payment_card
     crypto_account = user.crypto_account
@@ -30,7 +30,7 @@ def deposit():
 @jwt_required()
 def get_crypto():
     #user_id = session.get("user_id")
-    user_id = get_jwt_identity()
+    user_id = get_jwt_identity()["id"]
     crypto_account = CryptoAccount.query.filter_by(user_id=user_id).first()
     all_crypto_currencies = crypto_account.crypto_currencies
     schema = CryptoCurrencySchema(many=True)
@@ -42,7 +42,7 @@ def get_crypto():
 @jwt_required()
 def get_money():
     #user_id = session.get("user_id")
-    user_id = get_jwt_identity()
+    user_id = get_jwt_identity()["id"]
     crypto_account = CryptoAccount.query.filter_by(user_id=user_id).first()
 
     return jsonify({"value": crypto_account.amount}), 200

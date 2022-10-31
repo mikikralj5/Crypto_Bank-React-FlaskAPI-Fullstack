@@ -109,6 +109,7 @@ const RegistrationForm = () => {
         <div className="form-control">
           <label>Role</label>
           <select id="usertype" onChange={(e) => setRole(e.target.value)}>
+            <option>Choose option</option>
             <option value="PUSER">Premium user</option>
             <option value="RUSER">Regular user</option>
           </select>

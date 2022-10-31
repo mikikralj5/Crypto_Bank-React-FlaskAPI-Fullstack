@@ -63,7 +63,7 @@ def exchange():
     amount = int(x)
 
     price = get_price(buy, sell)
-    user_id = get_jwt_identity()
+    user_id = get_jwt_identity()["id"]
     #user_id = session.get("user_id")
     user = User.query.get(user_id)
     crypto_account = user.crypto_account

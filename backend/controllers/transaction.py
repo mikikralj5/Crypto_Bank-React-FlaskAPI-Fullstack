@@ -29,7 +29,7 @@ async def update_transaction_state():
     transaction_id = request.json["transaction_id"]
     state = request.json["state"]
     #user_id = session.get("user_id")
-    user_id = get_jwt_identity()
+    user_id = get_jwt_identity()["id"]
     transaction = Transaction.query.get(transaction_id)
     recipient = User.query.filter_by(email=transaction.sender).first()
     crypto_account = recipient.crypto_account
@@ -57,7 +57,7 @@ async def update_transaction_state():
 @jwt_required()
 def validate_transaction():
     user_otp = request.json["otp"]
-    user_id = get_jwt_identity()
+    user_id = get_jwt_identity()["id"]
     #user_id = session.get("user_id")
     user = User.query.get(user_id)
 
@@ -72,7 +72,7 @@ def validate_transaction():
 @jwt_required()
 def send_otp_email():
     #user_id = session.get("user_id")
-    user_id = get_jwt_identity()
+    user_id = get_jwt_identity()["id"]
     user = User.query.get(user_id)
     send_mail(user)
 
@@ -87,7 +87,7 @@ def create_transaction():
     cryptocurrency = request.json["currencyTransfer"]
     user_otp = request.json["otp"]
     #user_id = session.get("user_id")
-    user_id = get_jwt_identity()
+    user_id = get_jwt_identity()["id"]
     user = User.query.get(user_id)
     if user_exists(recipient_email) is True:
 
@@ -121,7 +121,7 @@ def filter_transaction():
     filter_by = request.json["filter_by"]
     value = request.json["value"]
     #user_id = session.get("user_id")
-    user_id = get_jwt_identity()
+    user_id = get_jwt_identity()["id"]
     user = User.query.get(user_id)
     all_transactions = user.transactions
 
@@ -138,7 +138,7 @@ def filter_transaction():
 @jwt_required()
 def get_transactions():
     #user_id = session.get("user_id")
-    user_id = get_jwt_identity()
+    user_id = get_jwt_identity()["id"]
     user = User.query.get(user_id)
     #all_transactions = user.transactions
     all_transactions = Transaction.query.all()
@@ -155,7 +155,7 @@ def get_transactions():
 @jwt_required()
 def get_transaction_requests():
     #user_id = session.get("user_id")
-    user_id = get_jwt_identity()
+    user_id = get_jwt_identity()["id"]
     user = User.query.get(user_id)
     all_transactions = Transaction.query.all()
     iterator = filter(lambda x: x.state ==
@@ -174,8 +174,9 @@ def announce(q1, q2):
 def mining(user_id, transaction_id, crypto_name, amount, q1):
     sleep(5 * 5)
     basedir = os.path.abspath(os.path.dirname(__file__))
-    engine = sqlalchemy.create_engine("sqlite:///" +
-                                      os.path.join(basedir, "CryptoDB.db"))
+    goald_dir = os.path.abspath(os.path.join(os.getcwd(),"CryptoDB.db"))
+    engine = sqlalchemy.create_engine("sqlite:///" + goald_dir)
+    
 
     local_session = sqlalchemy.orm.Session(bind=engine)
 

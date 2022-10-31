@@ -29,7 +29,7 @@ def verification_with_otp():
         #session["user_id"] = user.id
         access_token = create_access_token(identity={"id": user.id, "role": user.role}, expires_delta=timedelta(minutes=30))
         #return jsonify(access_token=access_token), 200
-        return {"token" : access_token, "verified" : "true"}
+        return {"token" : access_token, "verified" : "true", "role" : user.role}
         #return {"verified": "true"}
     else:
         return {"verified": "false"}
@@ -110,9 +110,11 @@ def get_current_user():
 @admin_required()
 def get_all_users():
    
+    user_id = get_jwt_identity()["id"]
     all_users = User.query.filter_by(is_blocked = False)
+    users_block = [item for item in all_users if item.id != user_id]
     schema = UserSchema(many=True)
-    res = schema.dump(all_users)
+    res = schema.dump(users_block)
     return jsonify(res)
 
 

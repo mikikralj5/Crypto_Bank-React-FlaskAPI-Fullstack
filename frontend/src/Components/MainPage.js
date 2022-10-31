@@ -9,6 +9,7 @@ import UserCryptoList from "./UserCryptoList";
 import TransactionList from "./TransactionList";
 import TransactionRequestLits from "./TransactionRequestLits";
 import CryptoGraphs from "./CryptoGraphs";
+import BlockUserList from "./BlockUserList";
 
 const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   const navigate = useNavigate();
@@ -132,6 +133,10 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
     setToShow("all");
   };
 
+  const showBlockUserList = () => {
+    setToShow("blockUserList");
+  };
+
   const showTransactions = async () => {
     setToShow("transactions");
     const resp = await httpClient.get(
@@ -203,6 +208,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
           />
         ) : null}
         {toShow === "graphs" ? <CryptoGraphs /> : null}
+        {toShow === "blockUserList" ? <BlockUserList /> : null}
       </div>
       <div className="summary">
         <button className="btn btn--show" onClick={showCurrencyAll}>
@@ -220,6 +226,11 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
         {localStorage.getItem("role") === "PUSER" ? (
           <button className="btn btn--show" onClick={showCryptoGraphs}>
             Crypto charts
+          </button>
+        ) : null}
+        {localStorage.getItem("role") === "ADMIN" ? (
+          <button className="btn btn--show" onClick={showBlockUserList}>
+            Block user
           </button>
         ) : null}
       </div>
