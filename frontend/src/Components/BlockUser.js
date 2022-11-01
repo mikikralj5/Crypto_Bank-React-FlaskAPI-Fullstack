@@ -3,9 +3,18 @@ import httpClient from "../httpClient";
 
 const BlockUser = ({ user, getUserList }) => {
   const blockUser = async () => {
-    await httpClient.post("http://127.0.0.1:5000/auth/blockUser", {
-      userId: user.id,
-    });
+    await httpClient.post(
+      "http://127.0.0.1:5000/auth/blockUser",
+      {
+        userId: user.id,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    );
     getUserList();
   };
   return (

@@ -45,7 +45,12 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
 
   useEffect(() => {
     const getUserMoney = async () => {
-      const resp = await httpClient("http://127.0.0.1:5000/account/getMoney");
+      const resp = await httpClient("http://127.0.0.1:5000/account/getMoney", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
 
       setUserMoney(resp.data.value);
     };
@@ -56,7 +61,13 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   useEffect(() => {
     const getUserCrypto = async () => {
       const resp = await httpClient.get(
-        "http://127.0.0.1:5000/account/getCrypto"
+        "http://127.0.0.1:5000/account/getCrypto",
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
       );
       setUserCryptoList(resp.data);
     };
@@ -67,7 +78,13 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   useEffect(() => {
     const getUserTransactions = async () => {
       const resp = await httpClient.get(
-        "http://127.0.0.1:5000/transaction/getTransactions"
+        "http://127.0.0.1:5000/transaction/getTransactions",
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
       );
       setUserTransactions(resp.data);
     };
@@ -75,21 +92,26 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
     getUserTransactions();
   }, [transferAmount]);
 
-  useEffect(() => {
-    const getTransactionRequests = async () => {
-      const resp = await httpClient.get(
-        "http://127.0.0.1:5000/transaction/getTransactionRequests"
-      );
+  // useEffect(() => {
+  //   const getTransactionRequests = async () => {
+  //     const resp = await httpClient.get(
+  //       "http://127.0.0.1:5000/transaction/getTransactionRequests"
+  //     );
 
-      setuserTransactionReqeusts(resp.data);
-    };
+  //     setuserTransactionReqeusts(resp.data);
+  //   };
 
-    getTransactionRequests();
-  }, []);
+  //   getTransactionRequests();
+  // }, []);
 
   useEffect(() => {
     const getUserEmail = async () => {
-      const resp = await httpClient.get("http://127.0.0.1:5000/auth/@me");
+      const resp = await httpClient.get("http://127.0.0.1:5000/auth/@me", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
       setUserEmail(resp.data.email);
     };
 
@@ -99,7 +121,13 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   useEffect(() => {
     const getSymbol = async () => {
       const resp = await httpClient.get(
-        "http://127.0.0.1:5000/crypto/showCryptoSymbols"
+        "http://127.0.0.1:5000/crypto/showCryptoSymbols",
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
       );
 
       const data = ["USD", ...resp.data];
@@ -113,7 +141,13 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   useEffect(() => {
     const getCurrencyAll = async () => {
       const resp = await httpClient.get(
-        "http://127.0.0.1:5000/crypto/showCrypto_all"
+        "http://127.0.0.1:5000/crypto/showCrypto_all",
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
       );
       setCurrencyAll(resp.data);
     };
@@ -124,7 +158,13 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   const showUserCrypto = async () => {
     setToShow("userCrypto");
     const resp = await httpClient.get(
-      "http://127.0.0.1:5000/account/getCrypto"
+      "http://127.0.0.1:5000/account/getCrypto",
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     );
     setUserCryptoList(resp.data);
   };
@@ -140,12 +180,28 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   const showTransactions = async () => {
     setToShow("transactions");
     const resp = await httpClient.get(
-      "http://127.0.0.1:5000/transaction/getTransactions"
+      "http://127.0.0.1:5000/transaction/getTransactions",
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     );
     setUserTransactions(resp.data);
   };
 
-  const showTransactionRequests = () => {
+  const showTransactionRequests = async () => {
+    const resp = await httpClient.get(
+      "http://127.0.0.1:5000/transaction/getTransactionRequests",
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    );
+    setuserTransactionReqeusts(resp.data);
     setToShow("requests");
   };
 
@@ -164,7 +220,13 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
 
   const onAccept = async () => {
     const resp = await httpClient.get(
-      "http://127.0.0.1:5000/transaction/getTransactions"
+      "http://127.0.0.1:5000/transaction/getTransactions",
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     );
     setUserTransactions(resp.data);
   };

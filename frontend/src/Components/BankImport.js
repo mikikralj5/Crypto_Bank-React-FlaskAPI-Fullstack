@@ -6,7 +6,13 @@ const BankImport = ({ userMoney, setUserMoney }) => {
   const transferMoney = async () => {
     const resp = await httpClient.patch(
       "http://127.0.0.1:5000/account/depositCrypto_Account",
-      { amount }
+      { amount },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     );
 
     setAmount(0);

@@ -52,27 +52,28 @@ function App() {
         <Routes>
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/" element={<LandingPage />} />
-
-          {/* <Route element={<RequireAuth />}> */}
-          <Route
-            path="/mainPage"
-            element={
-              <MainPage
-                turnOnModal={turnOnModal}
-                turnOnErroModal={turnOnErroModal}
-              />
-            }
-          />
           <Route path="/verification" element={<Verification />} />
-          <Route
-            path="/verificationTransaction"
-            element={
-              <TransferValidationModal turnOnErroModal={turnOnErroModal} />
-            }
-          />
-          <Route path="/graphs" element={<CryptoGraphs />} />
-          <Route path="/unauthorized" element={<Unauthorized />} />
-          {/* </Route> */}
+
+          <Route element={<RequireAuth />}>
+            <Route
+              path="/mainPage"
+              element={
+                <MainPage
+                  turnOnModal={turnOnModal}
+                  turnOnErroModal={turnOnErroModal}
+                />
+              }
+            />
+
+            <Route
+              path="/verificationTransaction"
+              element={
+                <TransferValidationModal turnOnErroModal={turnOnErroModal} />
+              }
+            />
+            <Route path="/graphs" element={<CryptoGraphs />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+          </Route>
         </Routes>
       </div>
     </Router>

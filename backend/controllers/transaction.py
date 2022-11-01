@@ -172,7 +172,7 @@ def announce(q1, q2):
 
 
 def mining(user_id, transaction_id, crypto_name, amount, q1):
-    sleep(5 * 5)
+    sleep(5 * 1)
     basedir = os.path.abspath(os.path.dirname(__file__))
     goald_dir = os.path.abspath(os.path.join(os.getcwd(),"CryptoDB.db"))
     engine = sqlalchemy.create_engine("sqlite:///" + goald_dir)

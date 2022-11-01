@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 const Verification = () => {
   const [otp, setOtp] = useState("");
   const [err, setErr] = useState(false);
+  const [logged, setLogged] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -19,10 +20,12 @@ const Verification = () => {
     );
 
     if (resp.data.verified === "true") {
-      console.log(resp.data.role);
       localStorage.setItem("token", resp.data.token);
       localStorage.setItem("role", resp.data.role);
-      navigate("/mainPage");
+      setLogged(true);
+      if (localStorage.getItem("token")) {
+        navigate("/mainPage");
+      }
     } else {
       setErr(true);
       setOtp("");

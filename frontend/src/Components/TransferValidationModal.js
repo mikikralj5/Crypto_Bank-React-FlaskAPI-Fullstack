@@ -19,6 +19,12 @@ const TransferValidationModal = ({ turnOnErroModal }) => {
         transferAmount,
         currencyTransfer,
         otp,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Access-Control-Allow-Origin": "*",
+        },
       }
     );
 

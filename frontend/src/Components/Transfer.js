@@ -12,7 +12,12 @@ const Transfer = ({
   const [currencyTransfer, setCurrencyTrasfer] = useState("BTC");
   const navigate = useNavigate();
   const validateTransfer = async () => {
-    await httpClient.get("http://127.0.0.1:5000/transaction/sendOtp");
+    await httpClient.get("http://127.0.0.1:5000/transaction/sendOtp", {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
     navigate("/verificationTransaction", {
       state: {
         recepient: recepient,

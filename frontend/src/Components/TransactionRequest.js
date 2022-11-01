@@ -16,6 +16,12 @@ const TransactionRequest = ({
       {
         state: value,
         transaction_id: transactionRequest.hashID,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Access-Control-Allow-Origin": "*",
+        },
       }
     );
 
