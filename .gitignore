@@ -129,3 +129,7 @@ dmypy.json
 .pyre/
 *.db
 frontend/package-lock.json
+
+.vscode
+.idea
+.DS_Store
