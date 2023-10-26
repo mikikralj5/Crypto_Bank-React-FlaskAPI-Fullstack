@@ -5,7 +5,7 @@ const BankImport = ({ userMoney, setUserMoney }) => {
   const [amount, setAmount] = useState(0);
   const transferMoney = async () => {
     const resp = await httpClient.patch(
-      "http://127.0.0.1:5000/account/depositCrypto_Account",
+      "http://127.0.0.1:5000/account/deposit",
       { amount },
       {
         headers: {
@@ -22,10 +22,11 @@ const BankImport = ({ userMoney, setUserMoney }) => {
   return (
     <div>
       <div className="operation operation--loan">
-        <h2>Import money from bank account</h2>
+        <h2>Import money from payment card</h2>
         <form className="form form--loan">
           <input
             type="number"
+            min = "0"
             className="form__input form__input--loan-amount"
             value={amount}
             onChange={(e) => {
@@ -47,3 +48,4 @@ const BankImport = ({ userMoney, setUserMoney }) => {
 };
 
 export default BankImport;
+

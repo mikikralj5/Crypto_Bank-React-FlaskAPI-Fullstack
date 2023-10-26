@@ -12,15 +12,16 @@ from flask_jwt_extended import (
 account = Blueprint("account", __name__)
 
 
-@account.route("/depositCrypto_Account", methods=["PATCH"])
+@account.route("/deposit", methods=["PATCH"])
 @jwt_required()
 def deposit():
     amount = request.json["amount"]
-    #user_id = session.get("user_id")
     user_id = get_jwt_identity()["id"]
     user = User.query.get(user_id)
     payment_card = user.payment_card
     crypto_account = user.crypto_account
+    if(payment_card.money_amount - int(amount) < 0):
+        return jsonify({"error": "You don't have enough money on payment card"})
     payment_card.money_amount -= int(amount)
     crypto_account.amount += int(amount)
     db.session.commit()
@@ -29,7 +30,6 @@ def deposit():
 @account.route("/getCrypto")  # pregled stanja
 @jwt_required()
 def get_crypto():
-    #user_id = session.get("user_id")
     user_id = get_jwt_identity()["id"]
     crypto_account = CryptoAccount.query.filter_by(user_id=user_id).first()
     all_crypto_currencies = crypto_account.crypto_currencies

@@ -19,6 +19,8 @@ const LandingNav = () => {
     if (resp.data.error === "Unauthorized") setErr(true);
     else navigate("/verification", { state: { email: email } });
 
+    
+
     setEmail("");
     setPassword("");
   };

@@ -7,7 +7,7 @@ const BlockUserList = () => {
 
   const getUserList = async () => {
     const resp = await httpClient.get(
-      "http://127.0.0.1:5000/auth/getAllUsers",
+      "http://127.0.0.1:5000/auth/getBlockableUsers",
       {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),

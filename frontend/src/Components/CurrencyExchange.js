@@ -41,7 +41,8 @@ const CurrencyExchange = ({
         <h2>Currency exchange</h2>
         <form className="form form--close">
           <input
-            type="text"
+            type="number"
+            min = "0"
             className="form__input form__input--to"
             value={amountToBuy}
             onChange={(e) => {

@@ -26,26 +26,18 @@ def verification_with_otp():
     if user_otp == user.otp:
         user.otp = "0"  # oznaka da je validiran
         db.session.commit()
-        #session["user_id"] = user.id
         access_token = create_access_token(identity={"id": user.id, "role": user.role}, expires_delta=timedelta(minutes=30))
-        #return jsonify(access_token=access_token), 200
         return {"token" : access_token, "verified" : "true", "role" : user.role}
-        #return {"verified": "true"}
     else:
         return {"verified": "false"}
 
 
 @auth.route("/registerUser", methods=["POST"])
 def register_user():
-    name = request.json["name"]
-    lname = request.json["lname"]
-    address = request.json["address"]
-    password = request.json["password"]
-    email = request.json["email"]
-    phone = request.json["phoneNum"]
-    country = request.json["country"]
-    city = request.json["city"]
-    role = request.json["role"]
+    name, lname, address, password, email, phone, country, city, role = (request.json[key] for key in
+                                                                         ["name", "lname", "address", "password",
+                                                                          "email", "phoneNum", "country", "city",
+                                                                          "role"])
 
     user_exists = User.query.filter_by(
         email=email).first() is not None
@@ -59,7 +51,7 @@ def register_user():
     db.session.add(user)
     db.session.commit()
 
-    create_payment_account(user)
+    create_payment_card(user)
     create_crypto_account(user)
 
     return Response(status=200)
@@ -70,7 +62,7 @@ def login_user():
     password = request.json["password"]
     email = request.json["email"]
 
-    user = User.query.filter_by(email=email).filter_by(is_blocked = False).first()
+    user = User.query.filter_by(email=email).filter_by(is_blocked=False).first()
     if user is None:
         return jsonify({"error": "Unauthorized"})
 
@@ -105,11 +97,10 @@ def get_current_user():
     user = User.query.filter_by(id=user_id).first()
     return jsonify({"email": user.email})
 
-@auth.route("/getAllUsers")
+@auth.route("/getBlockableUsers")
 @jwt_required()
 @admin_required()
-def get_all_users():
-   
+def get_blockable_users():
     user_id = get_jwt_identity()["id"]
     all_users = User.query.filter_by(is_blocked = False)
     users_block = [item for item in all_users if item.id != user_id]
@@ -141,7 +132,7 @@ def gen_datetime():
     return start + (end - start) * random.random()
 
 
-def create_payment_account(user):
+def create_payment_card(user):
     card_number = str(random.randint(1000, 9999))
     cvv = str(random.randint(100, 999))
     expiration_date = gen_datetime()

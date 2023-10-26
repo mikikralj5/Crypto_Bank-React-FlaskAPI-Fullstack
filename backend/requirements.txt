@@ -13,3 +13,4 @@ flask[async]
 pysha3
 requests
 flask-jwt-extended
+yagmail

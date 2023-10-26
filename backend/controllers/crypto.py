@@ -16,9 +16,8 @@ crypto = Blueprint("crypto", __name__)
 
 @crypto.route("/showCrypto_all")
 @jwt_required()
-def get_crypto_value():
+def showCrypto_all():
     url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest"
-    # parameters = {"start": 1, "limit": 5000}
     headers = {"Accepts": "application/json",
                "X-CMC_PRO_API_KEY": "4ceb685b-2766-45cc-8127-147c64386639"}
     sess = requests.Session()
@@ -64,7 +63,6 @@ def exchange():
 
     price = get_price(buy, sell)
     user_id = get_jwt_identity()["id"]
-    #user_id = session.get("user_id")
     user = User.query.get(user_id)
     crypto_account = user.crypto_account
     sum_to_pay = price * amount
@@ -75,7 +73,6 @@ def exchange():
         crypto_account.amount -= sum_to_pay
         crypto_currencies = crypto_account.crypto_currencies
         iterator = filter(lambda x: x.name == buy, crypto_currencies)
-        # da bi vratio listu ovo ogre je iterator
         crypto_currencies = list(iterator)
         if crypto_currencies == []:
             create_crypto_currency(buy, amount, crypto_account)
@@ -108,7 +105,6 @@ def exchange():
         crypto_currency.amount -= sum_to_pay
         crypto_currencies = crypto_account.crypto_currencies
         iterator = filter(lambda x: x.name == buy, crypto_currencies)
-        # da bi vratio listu ovo ogre je iterator
         crypto_currencies = list(iterator)
         if crypto_currencies == []:
             create_crypto_currency(buy, amount, crypto_account)
@@ -121,7 +117,6 @@ def exchange():
 
 
 def get_price(buy, sell):
-
     if buy == "USD":
         url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
         parameters = {"symbol": sell, "convert": buy}

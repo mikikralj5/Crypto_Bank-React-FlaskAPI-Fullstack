@@ -28,7 +28,6 @@ async def update_transaction_state():
 
     transaction_id = request.json["transaction_id"]
     state = request.json["state"]
-    #user_id = session.get("user_id")
     user_id = get_jwt_identity()["id"]
     transaction = Transaction.query.get(transaction_id)
     recipient = User.query.filter_by(email=transaction.sender).first()
@@ -58,7 +57,6 @@ async def update_transaction_state():
 def validate_transaction():
     user_otp = request.json["otp"]
     user_id = get_jwt_identity()["id"]
-    #user_id = session.get("user_id")
     user = User.query.get(user_id)
 
     if user_otp == user.otp:
@@ -71,7 +69,6 @@ def validate_transaction():
 @transaction.route("/sendOtp")
 @jwt_required()
 def send_otp_email():
-    #user_id = session.get("user_id")
     user_id = get_jwt_identity()["id"]
     user = User.query.get(user_id)
     send_mail(user)
@@ -86,26 +83,17 @@ def create_transaction():
     amount = int(request.json["transferAmount"])
     cryptocurrency = request.json["currencyTransfer"]
     user_otp = request.json["otp"]
-    #user_id = session.get("user_id")
     user_id = get_jwt_identity()["id"]
+
     user = User.query.get(user_id)
     if user_exists(recipient_email) is True:
-
         if user_otp != user.otp:
             return {"error": "Validation failed, please try again"}
 
-        user_crypto = user.crypto_account.crypto_currencies
-        temp = filter(lambda x: x.name ==
-                      cryptocurrency and x.amount > amount, user_crypto)
-        temp = list(temp)
-        if temp == []:
+        if check_resources(user, cryptocurrency, amount) is False:
             return {"error": "You don't have enough resources for this transfer"}
 
-        keccak = keccak_256()
-        generated_string = "" + user.email + recipient_email + \
-            str(amount) + str(randint(0, 1000))
-        keccak.update(generated_string.encode())
-
+        keccak = generate_hash(user, recipient_email, amount)
         transaction = Transaction(hashID=keccak.hexdigest(), sender=user.email, recipient=recipient_email, amount=amount,
                                   cryptocurrency=cryptocurrency, user_id=user_id, user=user, state=TransactionState.WAITING_FOR_USER.value)
         db.session.add(transaction)
@@ -115,12 +103,30 @@ def create_transaction():
         return {"error": "User with that email doesn't exist"}
 
 
+def check_resources(user, cryptocurrency, amount):
+    user_crypto = user.crypto_account.crypto_currencies
+    temp = filter(lambda x: x.name ==
+                            cryptocurrency and x.amount > amount, user_crypto)
+    temp = list(temp)
+    if temp == []:
+        return False
+    else:
+        return True
+
+
+def generate_hash(user, recipient_email, amount):
+    keccak = keccak_256()
+    generated_string = "" + user.email + recipient_email + \
+                       str(amount) + str(randint(0, 1000))
+    keccak.update(generated_string.encode())
+    return keccak
+
+
 @transaction.route("/filterTransaction", methods=["POST"])
 @jwt_required()
 def filter_transaction():
     filter_by = request.json["filter_by"]
     value = request.json["value"]
-    #user_id = session.get("user_id")
     user_id = get_jwt_identity()["id"]
     user = User.query.get(user_id)
     all_transactions = user.transactions

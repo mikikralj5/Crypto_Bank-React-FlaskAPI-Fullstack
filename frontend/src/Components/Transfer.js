@@ -51,7 +51,7 @@ const Transfer = ({
   return (
     <div>
       <div className="operation operation--transfer">
-        <h2>Transfer</h2>
+        <h2>Transaction</h2>
         <form className="form form--transfer">
           <input
             type="text"
@@ -62,7 +62,8 @@ const Transfer = ({
             }}
           />
           <input
-            type="text"
+            type="number"
+            min= "0"
             className="form__input form__input--to"
             value={transferAmount}
             onChange={(e) => {

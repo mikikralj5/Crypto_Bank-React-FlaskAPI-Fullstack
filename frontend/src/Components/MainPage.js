@@ -292,7 +292,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
         ) : null}
         {localStorage.getItem("role") === "ADMIN" ? (
           <button className="btn btn--show" onClick={showBlockUserList}>
-            Block user
+            Blockable users
           </button>
         ) : null}
       </div>
